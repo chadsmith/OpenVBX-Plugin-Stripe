@@ -1,0 +1,12 @@
+{
+	"name" : "Stripe",
+	"author" : "Chad Smith <chad@nospam.me>",
+	"description" : "Take payments over the phone using stripe.com",
+	"url" : "http://twitter.com/chadsmith",
+	"links" : [{
+		"menu" : "Stripe",
+		"url" : "stripe",
+		"script" : "stripe.php",
+		"label" : "Settings"
+	}]
+}

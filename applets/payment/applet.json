@@ -1,0 +1,8 @@
+{
+	"name" : "Payment",
+	"sms_name" : "Payment",
+	"voice_title" : "Payment",
+	"sms_title" : "Payment",
+	"description" : "Take a credit card payment.",
+	"type" : ["voice"]
+}
