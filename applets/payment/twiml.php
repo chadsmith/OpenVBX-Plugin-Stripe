@@ -7,17 +7,18 @@ define('STATE_GATHER_YEAR', 'stateGatherYear');
 define('STATE_GATHER_CVC', 'stateGatherCvc');
 define('STATE_SEND_PAYMENT', 'stateSendPayment');
 
-$response = new Response();
+$response = new TwimlResponse;
 
 $state = array(
 	PAYMENT_ACTION => STATE_GATHER_CARD,
 	'card' => array()
 );
 
+$ci =& get_instance();
 $settings = PluginData::get('settings');
 $amount = AppletInstance::getValue('amount');
 $description = AppletInstance::getValue('description');
-$digits = isset($_REQUEST['Digits']) ? $_REQUEST['Digits'] : false;
+$digits = clean_digits($ci->input->get_post('Digits'));
 $finishOnKey = '#';
 $timeout = 15;
 
@@ -63,20 +64,20 @@ if($digits !== false) {
 
 switch($state[PAYMENT_ACTION]) {
 	case STATE_GATHER_CARD:
-		$gather = $response->addGather(compact('finishOnKey', 'timeout'));
-		$gather->addSay($settings['card_prompt']);
+		$gather = $response->gather(compact('finishOnKey', 'timeout'));
+		$gather->say($settings['card_prompt']);
 		break;
 	case STATE_GATHER_MONTH:
-		$gather = $response->addGather(compact('finishOnKey', 'timeout'));
-		$gather->addSay($settings['month_prompt']);
+		$gather = $response->gather(compact('finishOnKey', 'timeout'));
+		$gather->say($settings['month_prompt']);
 		break;
 	case STATE_GATHER_YEAR:
-		$gather = $response->addGather(compact('finishOnKey', 'timeout'));
-		$gather->addSay($settings['year_prompt']);
+		$gather = $response->gather(compact('finishOnKey', 'timeout'));
+		$gather->say($settings['year_prompt']);
 		break;
 	case STATE_GATHER_CVC:
-		$gather = $response->addGather(compact('finishOnKey', 'timeout'));
-		$gather->addSay($settings['cvc_prompt']);
+		$gather = $response->gather(compact('finishOnKey', 'timeout'));
+		$gather->say($settings['cvc_prompt']);
 		break;
 	case STATE_SEND_PAYMENT:
 		require_once(dirname(dirname(dirname(__FILE__))) . '/stripe-php/lib/Stripe.php');
@@ -92,27 +93,27 @@ switch($state[PAYMENT_ACTION]) {
 				setcookie(PAYMENT_COOKIE);
 				$next = AppletInstance::getDropZoneUrl('success');
 				if(!empty($next))
-					$response->addRedirect($next);
-				$response->Respond();
+					$response->redirect($next);
+				$response->respond();
 				die;
 			}
 		}
 		catch(Exception $e) {
 			$error = $e->getCode();
-			$response->addSay($e->getMessage());
+			$response->say($e->getMessage());
 			if(array_key_exists($error, $card_errors)) {
 				$state[PAYMENT_ACTION] = $card_errors[$error];
-				$response->addRedirect();
+				$response->redirect();
 			}
 			else {
 				setcookie(PAYMENT_COOKIE);
 				$next = AppletInstance::getDropZoneUrl('fail');
 				if(!empty($next))
-					$response->addRedirect($next);
-				$response->Respond();
+					$response->redirect($next);
+				$response->respond();
 				die;
 			}
 		}
 }
 setcookie(PAYMENT_COOKIE, json_encode($state), time() + (5 * 60));
-$response->Respond();
+$response->respond();

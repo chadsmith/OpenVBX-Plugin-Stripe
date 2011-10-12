@@ -15,16 +15,25 @@ abstract class Stripe
 {
   public static $apiKey;
   public static $apiBase = 'https://api.stripe.com/v1';
-  const VERSION = '1.5.2';
+  public static $verifySslCerts = true;
+  const VERSION = '1.5.14';
 
-  public function getApiKey()
+  public static function getApiKey()
   {
     return self::$apiKey;
   }
 
-  public function setApiKey($apiKey)
+  public static function setApiKey($apiKey)
   {
     self::$apiKey = $apiKey;
+  }
+
+  public static function getVerifySslCerts() {
+    return self::$verifySslCerts;
+  }
+
+  public static function setVerifySslCerts($verify) {
+    self::$verifySslCerts = $verify;
   }
 }
 
@@ -51,3 +60,6 @@ require_once(dirname(__FILE__) . '/Stripe/Charge.php');
 require_once(dirname(__FILE__) . '/Stripe/Customer.php');
 require_once(dirname(__FILE__) . '/Stripe/Invoice.php');
 require_once(dirname(__FILE__) . '/Stripe/InvoiceItem.php');
+require_once(dirname(__FILE__) . '/Stripe/Plan.php');
+require_once(dirname(__FILE__) . '/Stripe/Token.php');
+require_once(dirname(__FILE__) . '/Stripe/Coupon.php');

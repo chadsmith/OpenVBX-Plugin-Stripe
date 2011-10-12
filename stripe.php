@@ -1,24 +1,24 @@
 <?php
-	if(count($_POST))
-		PluginData::set('settings', array(
-			'api_key' => $_POST['api_key'],
-			'card_prompt' => $_POST['card_prompt'],
-			'month_prompt' => $_POST['month_prompt'],
-			'year_prompt' => $_POST['year_prompt'],
-			'require_cvc' => isset($_POST['require_cvc']),
-			'cvc_prompt' => $_POST['cvc_prompt']
-		));
-	$settings = PluginData::get('settings', array(
-		'api_key' => null,
-		'card_prompt' => "Please enter your credit card number followed by the pound sign.",
-		'month_prompt' => "Please enter the month of the card's expiration date followed by the pound sign.",
-		'year_prompt' => "Please enter the year of the expiration date followed by the pound sign.",
-		'require_cvc' => true,
-		'cvc_prompt' => "Please enter the card's security code followed by the pound sign."
+if(count($_POST))
+	PluginData::set('settings', array(
+		'api_key' => $_POST['api_key'],
+		'card_prompt' => $_POST['card_prompt'],
+		'month_prompt' => $_POST['month_prompt'],
+		'year_prompt' => $_POST['year_prompt'],
+		'require_cvc' => isset($_POST['require_cvc']),
+		'cvc_prompt' => $_POST['cvc_prompt']
 	));
-	if(is_object($settings))
-		$settings = get_object_vars($settings);
-	OpenVBX::addJS('stripe.js');
+$settings = PluginData::get('settings', array(
+	'api_key' => null,
+	'card_prompt' => "Please enter your credit card number followed by the pound sign.",
+	'month_prompt' => "Please enter the month of the card's expiration date followed by the pound sign.",
+	'year_prompt' => "Please enter the year of the expiration date followed by the pound sign.",
+	'require_cvc' => true,
+	'cvc_prompt' => "Please enter the card's security code followed by the pound sign."
+));
+if(is_object($settings))
+	$settings = get_object_vars($settings);
+OpenVBX::addJS('stripe.js');
 ?>
 <style>
 	.vbx-stripe form {
@@ -32,7 +32,7 @@
 	<div class="vbx-content-menu vbx-content-menu-top">
 		<h2 class="vbx-content-heading">Stripe Settings</h2>
 	</div>
-    <div class="vbx-table-section vbx-stripe">
+	<div class="vbx-table-section vbx-stripe">
 		<form method="post" action="">
 			<fieldset class="vbx-input-container">
 				<p>
@@ -68,5 +68,5 @@
 				<p><button type="submit" class="submit-button"><span>Save</span></button></p>
 			</fieldset>
 		</form>
-    </div>
+	</div>
 </div>

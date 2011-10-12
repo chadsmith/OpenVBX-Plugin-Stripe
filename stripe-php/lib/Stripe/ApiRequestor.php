@@ -23,14 +23,18 @@ class Stripe_ApiRequestor
       return $value;
   }
 
-  private static function _objectsToIds($d)
+  private static function _encodeObjects($d)
   {
     if ($d instanceof Stripe_ApiRequestor) {
       return $d->id;
+    } else if ($d === true) {
+      return 'true';
+    } else if ($d === false) {
+      return 'false';
     } else if (is_array($d)) {
       $res = array();
-      foreach ($res as $k => $v)
-	$res[$k] = self::_objectsToIds($v);
+      foreach ($d as $k => $v)
+	$res[$k] = self::_encodeObjects($v);
       return $res;
     } else {
       return $d;
@@ -78,11 +82,11 @@ class Stripe_ApiRequestor
     if (!$myApiKey)
       $myApiKey = Stripe::$apiKey;
     if (!$myApiKey)
-      throw new Stripe_AuthenticationError('No API key provided.  (HINT: set your API key using "Stripe::$apiKey = <API-KEY>".  You can generate API keys from the Stripe web interface.  See https://stripe.com/api for details, or email support@stripe.com if you have any questions.');
+      throw new Stripe_AuthenticationError('No API key provided.  (HINT: set your API key using "Stripe::setApiKey(<API-KEY>)".  You can generate API keys from the Stripe web interface.  See https://stripe.com/api for details, or email support@stripe.com if you have any questions.');
 
     $absUrl = $this->apiUrl($url);
     $params = Stripe_Util::arrayClone($params);
-    self::_objectsToIds($params);
+    $params = self::_encodeObjects($params);
     $langVersion = phpversion();
     $uname = php_uname();
     $ua = array('bindings_version' => Stripe::VERSION,
@@ -126,6 +130,10 @@ class Stripe_ApiRequestor
       $opts[CURLOPT_POSTFIELDS] = self::encode($params);
     } else if ($meth == 'delete')  {
       $opts[CURLOPT_CUSTOMREQUEST] = 'DELETE';
+      if (count($params) > 0) {
+	$encoded = self::encode($params);
+	$absUrl = "$absUrl?$encoded";
+      }
     } else {
       throw new Stripe_ApiError("Unrecognized method $meth");
     }
@@ -138,15 +146,12 @@ class Stripe_ApiRequestor
     $opts[CURLOPT_RETURNTRANSFER] = true;
     $opts[CURLOPT_HTTPHEADER] = $headers;
     $opts[CURLOPT_USERPWD] = $myApiKey . ':';
+    $opts[CURLOPT_CAINFO] = dirname(__FILE__) . '/../data/ca-certificates.crt';
+    if (!Stripe::$verifySslCerts)
+      $opts[CURLOPT_SSL_VERIFYPEER] = false;
 
     curl_setopt_array($curl, $opts);
     $rbody = curl_exec($curl);
-
-    if (curl_errno($curl) == 60) { // CURLE_SSL_CACERT
-      curl_setopt($curl, CURLOPT_CAINFO,
-                  dirname(__FILE__) . '/../data/ca-certificates.crt');
-      $rbody = curl_exec($curl);
-    }
 
     if ($rbody === false) {
       $errno = curl_errno($curl);
@@ -168,8 +173,11 @@ class Stripe_ApiRequestor
     case CURLE_COULDNT_RESOLVE_HOST:
     case CURLE_OPERATION_TIMEOUTED:
       $msg = "Could not connect to Stripe ($apiBase).  Please check your internet connection and try again.  If this problem persists, you should check Stripe's service status at https://twitter.com/stripe, or let us know at support@stripe.com.";
+      break;
     case CURLE_SSL_CACERT:
+    case CURLE_SSL_PEER_CERTIFICATE:
       $msg = "Could not verify Stripe's SSL certificate.  Please make sure that your network is not intercepting certificates.  (Try going to $apiBase in your browser.)  If this problem persists, let us know at support@stripe.com.";
+      break;
     default:
       $msg = "Unexpected error communicating with Stripe.  If this problem persists, let us know at support@stripe.com.";
     }

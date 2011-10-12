@@ -1,6 +1,6 @@
 <?php
 
-class Stripe_InvoiceItem extends Stripe_ApiResource
+class Stripe_Coupon extends Stripe_ApiResource
 {
   public static function constructFrom($values, $apiKey=null)
   {
@@ -14,27 +14,21 @@ class Stripe_InvoiceItem extends Stripe_ApiResource
     return self::_scopedRetrieve($class, $id, $apiKey);
   }
 
-  public static function all($params=null, $apiKey=null)
-  {
-    $class = get_class();
-    return self::_scopedAll($class, $params, $apiKey);
-  }
-
   public static function create($params=null, $apiKey=null)
   {
     $class = get_class();
     return self::_scopedCreate($class, $params, $apiKey);
   }
 
-  public function save()
-  {
-    $class = get_class();
-    return self::_scopedSave($class);
-  }
-
   public function delete($params=null)
   {
     $class = get_class();
     return self::_scopedDelete($class, $params);
+  }
+  
+  public static function all($params=null, $apiKey=null)
+  {
+    $class = get_class();
+    return self::_scopedAll($class, $params, $apiKey);
   }
 }
