@@ -65,19 +65,31 @@ if($digits !== false) {
 switch($state[PAYMENT_ACTION]) {
 	case STATE_GATHER_CARD:
 		$gather = $response->gather(compact('finishOnKey', 'timeout'));
-		$gather->say($settings['card_prompt']);
+		$gather->say($settings['card_prompt'], array(
+			'voice' => $ci->vbx_settings->get('voice', $ci->tenant->id),
+			'voice_language' => $ci->vbx_settings->get('voice_language', $ci->tenant->id)
+		));
 		break;
 	case STATE_GATHER_MONTH:
 		$gather = $response->gather(compact('finishOnKey', 'timeout'));
-		$gather->say($settings['month_prompt']);
+		$gather->say($settings['month_prompt'], array(
+			'voice' => $ci->vbx_settings->get('voice', $ci->tenant->id),
+			'voice_language' => $ci->vbx_settings->get('voice_language', $ci->tenant->id)
+		));
 		break;
 	case STATE_GATHER_YEAR:
 		$gather = $response->gather(compact('finishOnKey', 'timeout'));
-		$gather->say($settings['year_prompt']);
+		$gather->say($settings['year_prompt'], array(
+			'voice' => $ci->vbx_settings->get('voice', $ci->tenant->id),
+			'voice_language' => $ci->vbx_settings->get('voice_language', $ci->tenant->id)
+		));
 		break;
 	case STATE_GATHER_CVC:
 		$gather = $response->gather(compact('finishOnKey', 'timeout'));
-		$gather->say($settings['cvc_prompt']);
+		$gather->say($settings['cvc_prompt'], array(
+			'voice' => $ci->vbx_settings->get('voice', $ci->tenant->id),
+			'voice_language' => $ci->vbx_settings->get('voice_language', $ci->tenant->id)
+		));
 		break;
 	case STATE_SEND_PAYMENT:
 		require_once(dirname(dirname(dirname(__FILE__))) . '/stripe-php/lib/Stripe.php');
@@ -100,7 +112,10 @@ switch($state[PAYMENT_ACTION]) {
 		}
 		catch(Exception $e) {
 			$error = $e->getCode();
-			$response->say($e->getMessage());
+			$response->say($e->getMessage(), array(
+				'voice' => $ci->vbx_settings->get('voice', $ci->tenant->id),
+				'voice_language' => $ci->vbx_settings->get('voice_language', $ci->tenant->id)
+			));
 			if(array_key_exists($error, $card_errors)) {
 				$state[PAYMENT_ACTION] = $card_errors[$error];
 				$response->redirect();
