@@ -19,14 +19,14 @@
 	<h2>After the payment</h2>
 	<div class="vbx-full-pane">
 		<?php echo AppletUI::DropZone('success'); ?>
-	</div><!-- .vbx-full-pane -->
+	</div>
 	<h2>If the payment fails</h2>
 	<div class="vbx-full-pane">
 		<?php echo AppletUI::DropZone('fail'); ?>
-	</div><!-- .vbx-full-pane -->
+	</div>
 <?php else: ?>
 	<div class="vbx-full-pane">
 		<h3>Please set your Stripe.com settings first.</h3>
 	</div>
 <?php endif; ?>
-</div><!-- .vbx-applet -->
+</div>
